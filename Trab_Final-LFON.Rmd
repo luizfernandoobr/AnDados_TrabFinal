@@ -1,0 +1,392 @@
+---
+title: "Determinantes da Proficiência em Língua Portuguesa no SAEB 2019: Perfil dos alunos do 9º ano no Estado de Pernambuco" 
+author: "Luiz Fernando Oliveira do Nascimento"
+date: "03/08/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("D:/luizf/Documents/PPGCP/2021.1/AnDados/Trab final/")
+options(scipen = 9999)
+options(max.print =100000)
+memory.limit(24576)
+library(data.table)
+TS_ALUNO_9EF <- data.table::fread(input='TS_ALUNO_9EF.csv',integer64='character')
+```
+
+## Resumo
+
+O presente trabalho constitui uma estimação dos fatores determinantes da proficiência em Língua Portuguesa de alunos do 9º ano do ensino fundamental no Estado de Pernambuco, no SAEB 2019. Essa estimação é feita utilizando o modelo de regressão logística, para verificar quais variáveis referente ao perfil do aluno exercem maior impacto na proficiência em Língua Portuguesa no SAEB, exame aplicado pelo Ministério da Educação (MEC) a cada dois anos para verificar o nível de proficiência dos alunos dos ensinos fundamental e médio em Língua Portuguesa e Matemática. Por fim, o resultado encontrado é que as variáveis que indicam reprovação e trabalho fora de casa são as que impactam negativamente o desempenho do aluno, sendo levantada uma hipótese acerca desse resultado.
+
+**Palavras-Chave:** Economia da Educação; SAEB; Língua Portuguesa; Proficiência.
+
+
+## Introdução 
+
+
+A Economia da Educação pode ser descrita como a área da ciência econômica que estuda as relações econômicas ligadas ao nível de escolaridade. Essa relação pode ser medida através da chamada teoria do capital humano, descrito como o conjunto de habilidades, técnicas e conhecimentos que podem influenciar a produção de valor econômico (MELLO, 1991). Segundo Shirasu e Arraes (2015), a educação é tida como o principal fator capaz de afetar a produtividade do trabalho. Isso porque é possível distinguir os trabalhadores mais habilidosos dos menos habilidosos através de indicadores de produtividade do trabalho. Essa diferença está quase sempre relacionada ao nível de estudo e indivíduos com alto nível de escolaridade são àqueles que apresentam mais condições de superar a pobreza.
+As mudanças tecnológicas têm propiciado uma demanda por mão de obra cada vez mais qualificada. Essa nova realidade do processo produtivo é relacionada à automação das atividades industriais e ao surgimento de novos postos de trabalho no setor de informática e tecnologia. Com isso, o papel da educação de base tem sido cada vez mais relevante para a boa formação dos profissionais que atuarão no mercado futuramente (MELLO, 1991). Para além do “acúmulo de informações segmentadas, torna-se mais importante dominar as formas de acesso à informação e desenvolver a capacidade de reunir e organizar aquelas que são relevantes” (MELLO, 1991).
+Dessa forma, o domínio dos instrumentos de linguagem e matemática assumem papel de destaque na formação daqueles estudantes que desejam se adaptar à nova realidade. Um domínio adequado dos conteúdos de Língua Portuguesa e Matemática permitem ao estudante a compreensão de uma série de conteúdos científicos e o desenvolvimento e “formação de habilidades cognitivas tais como: compreensão, pensamento analítico e abstrato, flexibilidade de raciocínio para entender situações novas e solucionar problemas” (MELLO, 1991). 
+Fundos específicos para o financiamento da educação pública só foram criados a partir da segunda metade da década de 1990 (SHIRASU; ARRAES, 2015). Mesmo gastando com educação como proporção do PIB mais que média dos países da OCDE (SHIRASU; ARRAES, 2015), o Brasil apresenta diversos entraves que impossibilitam o país de avançar no setor, além de colecionar fracos desempenhos em avaliações internacionais, como o PISA (*Programme for International Student Assess*). Dessa forma, o Brasil entrou no século XXI sem estar preparado para as transformações que vinham acontecendo desde os anos 1970. Isso levou a uma baixa qualificação que acentua o problema do emprego entre os mais jovens, atingindo uma taxa de desemprego de 29,8% entre os jovens de 18 a 24 anos ao final de 2020, uma alta de 6 pontos percentuais em relação ao ano anterior (IBGE, 2021).
+Além do fraco desempenho em avaliações, o baixo nível de proficiência em Língua Portuguesa e Matemática está diretamente relacionado aos altos índices de reprovação e abandono escolar, o que aprofunda o problema. Um estudante que apresenta pouco domínio dos conteúdos básicos na etapa final do ensino fundamental, provavelmente terá dificuldades em acompanhar os conteúdos do ensino médio, levando à reprovação escolar e/ou ao abandono (SHIRASU; ARRAES, 2015).
+Entender, então, quais são os fatores que levam ao baixo desempenho em Língua Portuguesa e Matemática se faz necessário para diagnosticar a fonte primária do problema e, assim, elaborar políticas públicas em educação capazes de solucioná-los de maneira estrutural e eficiente.
+Bassetto (2019) estudou o impacto da renda e da escolaridade materna no desempenho dos alunos do estado de São Paulo na prova de matemática do Sistema de Avaliação do Rendimento Escolar do Estado de São Paulo (SARESP). A escolha das variáveis é justificada pela autora porque "a determinante para o aspecto socioeconômico está ligada diretamente à renda dos pais e, consequentemente, ao nível educacional e cultural dos mesmos. Dessa forma, os recursos financeiros que estão à disposição dos pais se convertem em investimento educacional para os filhos, considerando que um menor nível educacional proporciona um menor nível socioeconômico em um longo prazo" (BASSETTO, 2019).Os resultados obtidos pela autora permitiram concluir que a renda e a escolaridade da mãe exercercem influência só até determinada faixa de renda e a escolaridade da mãe apresenta maior influência no desempenho dos alunos com nível de proficiência menor, mas não nos de proficiência mais alta (BASSETTO, 2019).
+A proficiência em Língua Portuguesa pode ser testada empiricamente através de três grupos de variáveis observáveis: variáveis do aluno, da família e da escola. As variáveis do aluno são àquelas que dizem respeito ao comprometimento do mesmo com a disciplina e fatores socioeconômicos, que podem ser medidos pelo fato do aluno exercer profissão remunerada ou não. As variáveis da família são àquelas que relacionam a escolaridade dos pais e o incentivo a estudar dados aos filhos com a proficiência. E, por fim, as variáveis da escola são àquelas que relacionam a proficiência dos alunos ao nível de capacitação dos professores e à infraestrutura básica da unidade de ensino. Neste trabalho, serão utilizadas apenas as variáveis do aluno, na tentativa de conhecer o perfile as característica do aluno que consegue atingir determinado nível de proficiência em língua portuguesa no 9º ano do ensino fundamental.
+
+
+## Aspectos Metodológicos 
+
+### Fonte e Tratamento de Dados
+
+Os dados utilizados na estimação do modelo para os fatores determinantes da proficiência em Língua Portuguesa são os resultados obtidos por meio das Informações das respostas ao questionário e das proficiências dos alunos do 9º ano do Ensino Fundamental na prova do SAEB 2019, disponibilizado pelo Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP). A Tabela 1 apresenta as variáveis utilizadas na estimação do modelo, sua descrição e o sinal esperado de cada variável após a estimação da regressão logística. 
+
+```{r importacao_dados}
+library(tidyverse)
+dados <- TS_ALUNO_9EF %>% 
+  select(ID_ALUNO, ID_UF, PROFICIENCIA_LP_SAEB, TX_RESP_Q002, ID_TURNO,
+         TX_RESP_Q006B, TX_RESP_Q018B, 
+         TX_RESP_Q017E, TX_RESP_Q015) %>% 
+  filter(ID_UF == 26,
+         PROFICIENCIA_LP_SAEB != is.na(PROFICIENCIA_LP_SAEB),
+         TX_RESP_Q002 != "F") %>% 
+  mutate(TX_RESP_Q002 = recode(TX_RESP_Q002, 
+                        "A" = "Branco", "B" = "Não branco",
+                        "C" = "Não branco", "D" = "Não branco",
+                        "E" = "Não branco"),
+         TX_RESP_Q006B = recode(TX_RESP_Q006B, 
+                               "A" = "FALSE", "B" = "TRUE", 
+                               "C" = "TRUE"),
+         TX_RESP_Q017E = recode(TX_RESP_Q017E, 
+                                "A" = "FALSE", "B" = "TRUE", 
+                                "C" = "TRUE", "D" = "TRUE"),
+         TX_RESP_Q018B = recode(TX_RESP_Q018B, 
+                                "A" = "FALSE", "B" = "TRUE", 
+                                "C" = "TRUE"),
+         TX_RESP_Q015 = recode( TX_RESP_Q015, 
+                               "A" = "FALSE", "B" = "TRUE", 
+                               "C" = "TRUE"), 
+         Nivel_3 = PROFICIENCIA_LP_SAEB >= 250,
+         Turno_N = ID_TURNO == 3)
+
+dados <- dados %>% mutate(TX_RESP_Q002 = as_factor(TX_RESP_Q002),
+       Nivel_3 = as.numeric(Nivel_3)) %>%
+  filter(TX_RESP_Q002 != "." & TX_RESP_Q002 != "*",
+         TX_RESP_Q006B != "." & TX_RESP_Q006B != "*",
+         TX_RESP_Q015 != "." & TX_RESP_Q015 != "*",
+         TX_RESP_Q017E != "." & TX_RESP_Q017E != "*",
+         TX_RESP_Q018B != "." & TX_RESP_Q018B != "*")
+```
+
+
+**Tabela 1 - Variáveis do Modelo Logit Para Determinantes da Proficiência em Língua Portuguesa de alunos do 9º ano de Pernambuco no SAEB 2019**
+
+Variáveis     	     |Descrição das variáveis             |Sinal esperado
+---------------------|------------------------------------|---------------------
+Nivel_3              |Nota igual ou maior que 250 em LP   | Variável Dependente
+TX_RESP_Q002         |Cor/raça do aluno                   |+ ou -
+TX_RESP_Q006B        |Mãe/pai incentiva o aluno a estudar |+
+Turno_N              |Aulas em turno noturno              |-
+TX_RESP_Q015         |Aluno já foi reprovado              |-
+TX_RESP_Q017E        |Aluno trabalha fora de casa         |-
+TX_RESP_Q018B        |Aluno costuma ler livros            |+ 
+Fonte: Elaboração própria.
+
+
+A maior parte das variáveis apresenta expectativa de sinal negativo, com exceção da cor/raça dos alunos e da variáveis que indicam se o aluno em questão costuma ler livros (excluídos materiais didáticos e paradidáticos) e se os responsáveis costumam incetivá-lo a estudar. No caso específico de cor/raça, o objetivo da inclusão foi verificar se há alguma diferença na proficiência entre pessoas brancas e não brancas, não sendo levantada, a priori, nenhuma hipótese de comportamento para essa variável.
+Conforme informado anteriormente, as variáveis foram coletadas dos resultados e dos questionários do SAEB 2019. Segundo o INEP, a proficiência em Língua Portuguesa é medida em uma escala que vai de 0 a 500 pontos, dividida em 9 níveis de proficiência, que vão do 0 ao 8, cada um deles indica um conjunto de habilidades das quais o aluno é capaz. Como a variável dependente no modelo logit binário (adotado neste trabalho) dever necessariamente ser uma variável categórica onde 1 indica a presença de uma característica e 0 a ausência desta, optou-se por estudar os fatores que levam o estudante a obter uma nota igual ou superior a 250 pontos, o que indicaria que o aluno em questão alcança, no mínimo, o nível 3 de proficiência em Língua Portuguesa, considerado um resultado intermediário na escala estabelecida pelo INEP. A Figura 1 representa a operacionalização do modelo.
+
+**Figura 1 - Esquema de Operacionalização do Modelo Teórico**
+![](D:/luizf/Documents/PPGCP/2021.1/AnDados/Trab final/esquema21.png) 
+Fonte: Elaboração própria com base em Kellstedt e Whitten (2018).
+
+
+Conforme demonstrado na figura, o modelo teórico a ser utilizado considera que o desempenho escolar é derivado do perfil e características do aluno. Do ponto de vista teórico, características da família e da escola em que esse indivíduo está inserido também exercem influência sobre o seu desempenho. Por simplicidade, este trabalho considera o trabalho fora de casa e o incentivo dos pais ao aluno estudar como reflexos do aspecto familiar e socieconômico do mesmo. Por ser uma simplificação da realidade traduzida por duas variáveis proxy, a validade dos resultados pode ser questionada. No entanto, é razoável supor que alunos que trabalham fora de casa estão inseridos em condições socioeconômicas adversas, sendo isso que os motiva a buscar trabalho na idade escolar. Vale destacar que, pela relação idade/série do MEC e INEP, o 9º ano do ensino fundamental deve ser cursado por alunos que completam 14 ou 15 anos até o mês de outubro do ano de referência. Ou seja, do ponto de vista legal, alunos matriculados no 9º ano podem ser contratados formalmente como jovens aprendizes. Infelizmente, não é possível filtrar o tipo de trabalho exercido pelos alunos, nem se o mesmo é do tipo formal ou informal.
+O incentivo dos pais representa, por hipótese, o grau de envolvimento dos mesmos com a vida escolar de seus filhos. Novamente, trata-se de uma simplificação da realidade. Como o INEP não aplica questionários aos pais e responsáveis, está sendo considerado o "incentivo autodeclarado" pelo aluno no seu questionário. Nenhuma das variáveis operacionalizadas trata das características físicas das escolas e/ou do grau de formação dos professores. A exclusão desse nicho de variáveis implica que tais características passam a compor o erro. Logo, está sendo admitida a hipótese (ainda que de maneira implítica) de que as escolas apresentam características muito semelhantes, o que é irrealista, mas necessário para manter a parcimônia do modelo, visto que o objetivo central é conhecer o perfil do aluno por suas características pessoais e não por atributos externos ao seu controle. Devido à restrição de disponibilidade dos dados, não é possível incorporar outras características pessoais, como por exemplo sexo biológico e/ou identidade de gênero, ao modelo.
+Idealmente, a variável de desempenho utilizada deveria conter a proficiência não só em língua portuguesa, como nas demais disciplinas. Ou seja, o desempenho escolar seria melhor operacionalizado se estivesse disponível alguma medida similar ao Coeficiente de Rendimento Acadêmico (CRA) adotado na maioria das universidades. Ainda assim, é razoável supor que o desempenho nas demais disciplinas, e, consequentemente, a própria trajetória escolar do aluno está diretamente ligado ao seu desempenho na sua língua materna. Como algumas das competências avaliadas pelo SAEB dizem respeito à capacidade demonstrada no exame pelo aluno de interpretar textos e compreender a ideia geral de fragmentos de textos, é possível supor que um aluno que não apresente tais capacidade não seja capaz de compreender textos de caráter mais técnicista.
+Ou seja, um aluno com baixo desempenho em língua portuguesa quase que certamente apresentará baixo desempenho em ciências, geografia, história e nas demais disciplinas. Outra possibilidade seria considerar como proxy para o desempenho escolar a nota obtida na prova de matemática do SAEB 2019, porém, não foi identificada nos questionários aplicados pelo INEP outra pergunta equivalente ao hábito de leitura que fosse capaz de exercer efeito positivo no aprendizado de matemática. Além disso, o aprendizado em matemática está associado ao aprendizado em língua portuguesa, visto que é pouco provável que um aluno que apresente pouca habilidade de interpretação de texto seja capaz de retirar todas as informações necessárias à resolução dos problemas propostos dos fragmentos de texto fornecidos no enunciado das questões da prova. 
+
+
+### Modelo Empírico Adotado 
+
+
+Figueira (2006), diz que em situações em que se deseja utilizar uma variável dependente que qualitativa categórica, não é possível encontrar estimadores consistentes utilizando o método de Mínimos Quadrados Ordinários (MQO). Uma opção, é tentar encontrar a probabilidade de um determinado evento ocorrer, utilizando o modelo de regressão logística. Embora seja possível utilizar o Modelo de Probabilidade Linear (MPL), que utiliza o MQO para encontrar a probabilidade um evento ocorrer, não é possível garantir que o parâmetro estimado se situará no intervalo entre 0 e 1. Como qualquer probabilidade de um evento *Y* ocorrer dado a ocorrência de *X* deve estar necessariamente no intervalo entre 0 e 1 e o MQO não leva em conta tal restrição, o uso do MPL pode gerar resultados que não obedeçam a lógica das probabilidades, ou seja, é possível que se encontrem resultados fora dos limites lógicos (GUJARATI; PORTER, 2011). 
+O uso do modelo logit permite encontrar o logaritmo de razão das chances *L*, que é linear em *X* (variável dependente), mas não é linear nas probabilidades. Ou seja, diferentemente do que ocorre com o MPL, as probabilidades não aumentam de forma linear com a variável  *X*. É importante destacar que o modelo logit permite a inclusão de quantas variáveis independentes estiverem associadas teoricamente à variável dependente. Encontrar um *L* positivo, significa dizer que as chances de um determinado evento ocorrer dado a ocorrência de *X* aumentam, enquanto que um *L* negativo indica que as chances de um determinado evento ocorrer na presença de *X* diminuem. (GUJARATI; PORTER, 2011). 
+De acordo com Gujarati e Porter (2011), Diferentemente do que ocorre nos modelos estimados por MQO, a significância estatística do modelo logit é verificada pela estatística Z (normal), isso é resultado do uso do Método de Máxima Verossimilhança (MV) para a estimação dos coeficientes. Ainda segundo os autores. a significância global do modelo não é medida pelo  *R^2* convencional, visto que essa medida não significativa em modelos de regressores binários. Nesses modelos, os sinais esperados dos coeficientes e suas significâncias assumem importância maior que a qualidade do ajustamento. Ainda assim, a significância conjunta dos parâmetros estimados, medida pelo teste *F* no MQO, pode ser verificada pela estatística de Razão de Verossimilhança. 
+A equação (1) apresenta o modelo econométrico a ser estimado, utilizando modelo de regressão logit,  um modelo resposta qualitativa não-linear que apresenta distribuição logística. A equação abaixo informa que o modelo empírico estima a probabilidade, medida pelos efeitos marginais, do aluno apresentar nota superior a 250 em Língua Portuguesa na Prova Brasil para cada variável apresentada na Tabela 1. 
+
+
+$$ Pi = F(Yi) = \frac{1}{1+e^-(\alpha +\beta Xi)} $$
+
+
+Para a estimação do modelo, todas as variáveis qualitativas foram transformadas em variáveis dicotômicas. O objetivo é simplicar a análise transformando variáveis que, por natureza, possuem mais de duas categorias em variáveis binárias. A escolha pela classificação da variável de cor/raça entre brancos e não brancos é advinda do perfil populacional do estado de Pernambuco, onde mais de 35% das pessoas se autodeclaram brancas, com os 65% sendo classificados como não brancos para fins desta pesquisa. Conforme informado anteriormente, essa classificação não busca identificar qualquer fator determinístico no desempenho escolar pelo perfil racial, apenas se busca verificar se existe uma diferença de desempenho escolar entre as duas categorias, o que poderia servir de base para a construção de políticas públicas focalizadas no grupo que apresenta de menor desempenho.
+Da mesma forma, as variáveis de incentivo ao estudo, trabalho fora de casa e hábito de leitura são originalmente disponibilizadas pelo INEP divididas em mais categorias. Novamente, por simplicidade, essas variáveis foram transformadas em binárias, ainda que seja razoável supor que um aluno que trabalhe 10 horas por semana disponha de menos tempo livre para os estudos do que um aluno que trabalhe 5 horas por semana. Da mesma forma, pressupõe-se que ler mais livros afeta mais o desempenho escolar do que ler menos livros, bem como ser mais incentivado pode afetar mais do que ser pouco incentivado. No entanto, a busca não é por verificar o efeito marginal de 1 livro ou de 1 hora de trabalho, mas sim entender se o hábito de ler ou de trabalhar afetam o desempenho. Assim, a redução no número de categorias em cada variável simplifica a análise. 
+
+
+
+## Análise dos Resultados
+
+
+Esta seção de resultados está estruturada em duas subseções: na primeira são apresentadas algumas estatísticas descritivas e testes de hipóteses das variáveis utilizadas nos modelos estimados, na segunda são apresentados os resultados estimados pelo modelo logit e, por fim, é apresentada uma avaliação dos modelos estimados.
+
+### Descrição dos Dados e Testes de Hipóteses
+
+
+A análise das estatísticas descritivas das variáveis permitem conhecer algumas das propriedades da série estudada, sendo este o primeiro passo para verificar o formato e a distribuição de frequências da série estudada. O histograma abaixo (Figura 2) apresenta o formato da distribuição das notas obtidas pelos alunos do 9º ano do Ensino Fundamental de Pernambuco em Língua Portuguesa no SAEB 2019.
+
+```{r histograma}
+library(ggplot2)
+ggplot(dados, aes(x = PROFICIENCIA_LP_SAEB)) + 
+  geom_histogram(aes(y =..density..), colour="black", fill="gray")+
+  geom_density(alpha =.3, fill ="#FF6666") +
+  labs(title ="Figura 2 - Histograma das Notas em Língua Portuguesa dos Alunos do 9º ano de Pernambuco no SAEB 2019",
+       x ="Nota LP", y = "Densidade")+
+  theme_classic()
+```
+
+
+O histograma apresenta um formato parecido com o "formato de sino", característico das distribuições normais. Chama atenção o fato de que a quantidade de observações próximas a cauda à esquerda aparenta ser levemente maior que as da cauda à direita. Ou seja, a quantidade de alunos com nota igual ou inferior a 200 aparenta ser um pouco maior que a quantidade de alunos com nota igual ou superior a 300 pontos. A maior parte das notas se situa ao centro da distribuição. A Tabela 2 apresenta os resultados estimados para os testes de normalidade da variável. 
+
+
+```{r normalidade}
+library(fBasics)
+skewness(dados$PROFICIENCIA_LP_SAEB)
+kurtosis(dados$PROFICIENCIA_LP_SAEB)
+jarqueberaTest(dados$PROFICIENCIA_LP_SAEB)
+qqnorm(dados$PROFICIENCIA_LP_SAEB, col="blue3")
+qqline(dados$PROFICIENCIA_LP_SAEB, col = "red")
+```
+
+**Tabela 2 - Testes de Normalidade das Notas em Língua Portuguesa dos Alunos do 9º ano de Pernambuco no SAEB 2019**
+
+Testes         |PROFICIENCIA_LP_SAEB
+---------------|--------------------------
+Simetria       |-0.0766
+Curtose        |-0.4581
+Jarque-Bera    |724.5073  p-valor: 0,000
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+Segundo Maia (2016), a simetria é definida como sendo o grau de afastamento de uma distribuição em relação a distribuição normal, como a estatística encontrada é menor do que zero, tem-se que a distribuição dos dados é assimétrica negativa, o que significa que "existirão mais dados da série  maiores do que a médiaa, porém a curva de distribuição terá uma cauda mais longa para os dados menores do que a média" (MAIA, 2016). Ainda segundo o mesmo autor, a Curtose representa o grau de achatamento de uma distribuição, quando a estatística encontrada é menor do que 3 (sendo 3 o valor de referência para uma distribuição normal), a mesma é denominada platicúrtica e apresenta alta variabilidade. O teste de Jarque-Bera permite verificar se uma distribuição é normal, tendo por hipótese nula a normalidade da distribuição. Ou seja, pela observação do p-valor pode-se rejeitar a hipótese nula do teste Jarque-Bera, o que significa que a distribuição das notas em língua portuguesa não apresenta características de uma distribuição normal. O gráfico QQ-Plot é outra forma de avaliar se uma distribuição é uma distribuição normal. Quanto mais próximos os pontos azuis estiverem da linha vermelha, mais próxima estará a distribuição em questão de uma distribuição normal. O gráfico QQ-Plot mostra que as observações localizadas próximas as pontas se afastam da linha vermelha, sendo essa uma forma gráfica de confirmar que a distribuição das notas não é uma distribuição normal. A Tabela 3 apresenta as estatísticas descritivas das notas obtidas em língua portuguesa distribuídas entre as categorias estudadas.
+
+```{r descritivas}
+# Nota por Cor/raça
+dados %>% group_by(TX_RESP_Q002) %>%
+  summarise(media = mean(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            min = min(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            max = max(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            sd = sd(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            median = median(PROFICIENCIA_LP_SAEB, na.rm = TRUE))
+# Nota trabalha/não trabalha
+dados %>% group_by(TX_RESP_Q017E) %>%
+  summarise(media = mean(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            min = min(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            max = max(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            sd = sd(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            median = median(PROFICIENCIA_LP_SAEB, na.rm = TRUE))
+# Nota Reprovado
+dados %>% group_by(TX_RESP_Q015) %>%
+  summarise(media = mean(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            min = min(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            max = max(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            sd = sd(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            median = median(PROFICIENCIA_LP_SAEB, na.rm = TRUE))
+# Nota Turno
+dados %>% group_by(Turno_N) %>%
+  summarise(media = mean(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            min = min(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            max = max(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            sd = sd(PROFICIENCIA_LP_SAEB, na.rm = TRUE),
+            median = median(PROFICIENCIA_LP_SAEB, na.rm = TRUE))
+```
+
+
+**Tabela 3 - Estatísticas Descritivas das Notas em Língua Portuguesa no SAEB 2019 de Alunos do 9º ano de Pernambuco por Categoria de Análise**
+
+Categorias de Notas  |Mínimo  |Média   |Mediana   |Máximo  |Desvio-padrão
+---------------------|--------|--------|----------|--------|--------------
+Brancos              |120,00  |259,00  |262,00    |377,00  |48,60
+Não brancos          |118,00  |251,00  |253,00    |377,00  |46,50
+Trabalha             |118,00  |242,00  |243,00    |377,00  |46,80
+Não trabalha         |118,00  |256,00  |258,00    |377,00  |46,80
+Reprovado            |118,00  |233,00  |232,00    |376,00  |43,50
+Não reprovado        |120,00  |261,00  |263,00    |377,00  |46,30 
+Turno Diurno         |118,00  |253,00  |255,00    |377,00  |47,10
+Turno Noturno        |138,00  |257,00  |256,00    |368,00  |46,90 
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+De forma geral, as estatísticas apresentadas demonstram haver diferenças nas médias entre os grupos avaliados. Conforme o esperado, o grupo de alunos que não trabalham e que não foram reprovados apresentaram média e mediana maiores que as do grupos de alunos que trabalham fora de casa e/ou foram reprovados. Também é possível destacar que o grupo de alunos brancos apresentaram notas mínimas, média e mediana maiores que o grupo de alunos não brancos, mas a dispersão em torno da média, apontada pelo desvio-padrão, foi menor para o segundo grupo. Surpreendeu o fato de que alunos matriculados no turno noturno terem apresentado média e nota mínima superior às notas dos alunos matriculados no período diurno (matutinou ou vespertino). A simples observação das diferenças entre as médias não permite afirmar que existe uma diferença estatísticamente significante entre elas. Para isso, é necessário verificar se existe diferença estatística por meio de testes de hipóteses adequados para cada tipo de variável. A Tabela 4 apresenta os testes de hipóteses estimados. 
+
+
+```{r thipoteses}
+# Teste t
+t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q002, data = dados)
+t.test(PROFICIENCIA_LP_SAEB ~ Turno_N, data = dados)
+t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q006B, data = dados)
+t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q015, data = dados)
+t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q017E, data = dados)
+#Qui-quadrado
+chisq.test(dados$Nivel_3, dados$TX_RESP_Q017E)
+chisq.test(dados$TX_RESP_Q017E, dados$Turno_N)
+```
+
+
+**Tabela 4 - Testes de Hipóteses Estimados**
+ 
+**Teste  t**              |Estatística do teste   |p-valor
+--------------------------|-----------------------|---------------------
+PROF_LP ~ TX_RESP_Q002    |-19,516                |0,0000
+PROF_LP ~ Turno_N         |-1,7788                |0,0759
+PROF_LP ~ TX_RESP_Q006B   |-4,9568                |0,0000
+PROF_LP ~ TX_RESP_Q015    |75,125                 |0,0000
+PROF_LP ~ TX_RESP_Q017E   |34,461                 |0,0000
+**Teste  Qui-quadrado**   |                       | 
+Nivel_3 ~ TX_RESP_Q017E   |759,50                 |0,0000
+TX_RESP_Q017E ~ Turno_N   |107,42                 |0,0000
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+O teste t verifica se existe diferença entre as médias de variáveis contínuas por cada categoria de uma variável categória. Foram realizados 5 testes para verificar a associção entre a nota obtida por alunos em língua portuguesa no SAEB 2019 e as categorias de cor/raça, turno, incentivo dos pais, reprovação e trabalho fora de casa.A hipótese nula do teste nos diz que a diferença entre as médias entre as categorias é igual a zero, ou seja, aceitar a hipótese nula significa dizer que as médias observadas na Tabela 3 são iguais entre as categorias de análise. Pela observação do p-valor e dos intervalos de confianças, pode-se inferir que a diferença entre as médias é estatisticamente diferente de zero entre as categorias da maioria das variáveis, com exceção da variável de turno escolar. Neste caso, o intervalo de confiança encontrado inclui o valor zero e o p-valor encontra-se acima de 0,05, não havendo segurança para a rejeição da hipótese nula.
+O teste de Qui-quadrado foi estimado para verificar a associação entre entre as variáveis categóricas. A hipótese nula desse teste diz que não há associação entre duas variáveis categóricas quaisquer.  Primeiro, verificou-se se existe alguma associação entre alcançar uma nota igual ou superior a 250 pontos em língua portuguesa no SAEB (nível 3 ou superior, na escala do INEP) e o trabalho fora de casa. Posteriormente verificou-se a associação entre o trabalho fora de casa e o período noturno de aulas. Para os dois casos, pôde-se rejeitar a hipótese nula de que as variáveis não estão associadas de alguma forma, tanto pelos valores obtidos para a estatística do teste, quanto pela observação do p-valor. Com a verificação da existência de associação entre as variáveis, foi possível dar início à estimação do modelo de regressão logística, cujo os resultados encontrados estão apresentados na na seção a seguir. 
+
+
+### Estimação do Modelo Logit
+
+
+As tabelas 5 e 6 apresentam os resultados, respectivamente, dos modelos estimados com e sem interação. Na estimação com uma variável de interação, optou-se por considerar que existe uma associação (sinalizada pelo teste de Qui-quadrado) entre o trabalho fora de casa e a matrícula no período noturno. Para tal, a hipótese levantada é de que alunos que trabalham foram de casa buscam se matricular no período noturno para não abandonarem a escolar. Assim, espera-se que o sinal da variável de interação seja negativo.
+
+```{r logit}
+logit <- glm(Nivel_3 ~ TX_RESP_Q002 + TX_RESP_Q006B + Turno_N + 
+            TX_RESP_Q015 + TX_RESP_Q017E + TX_RESP_Q018B,
+             data = dados, family = binomial)
+summary(logit)
+```
+
+**Tabela 5 - Resultados da Estimação do Modelo Logit Para Determinantes da Proficiência em Língua Portuguesa de alunos do 9º ano de Pernambuco no SAEB 2011**
+
+Var. Depend.   |Coef.      |Erro-padrão    |Estatística  z    |p-valor
+---------------|-----------|---------------|------------------|----------
+Intercepto     |0,10806    |0,05233        |2,065             |0,0389
+TX_RESP_Q002   |0,26724    |0,01828        |14,618            |0,0000
+TX_RESP_Q006B  |0,08410    |0,05140        |1,636             |0,1018
+Turno_N        |0,37287    |0,09705        |3,842             |0,0001
+TX_RESP_Q015   |-0,97304   |0,01732        |-56,181           |0,0000
+TX_RESP_Q017E  |-0,36416   |0,01845        |-19,740           |0,0000
+TX_RESP_Q018B  |0,34428    |0,01845        |20,679            |0,0000
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+A significância individual, obtida tanto pelo valor da estatística z quanto pelo p-valor, mostra que apenas a variável de incentivo dos pais ao aluno estudar não foi siginifcante para explicar o modelo. O intercepto é considerado significante a 5%, enquanto que os demais parâmetros estimados apresentam nível de confiança superior a 99,99%. A análise econômica é feita pela interpretação dos efeitos marginais das variáveis estatisticamente significantes, excetuando-se a constante. O efeito marginal mede a probabilidade em pontos percentuais do aluno obter uma nota superior a 250 pontos em Língua Portuguesa no SAEB 2019. Os sinais dos parâmetros estimados estão de acordo com os previstos na Tabela 1, com exceção da variável que representa o turno em que o aluno está matriculado.
+Assim, temos que a probabilidade de o aluno obter nota superior a 250 pontos reduz em 36,41 pontos percentuais caso o mesmo exerça profissão remunerada ou não e aumenta em 34,42 pontos percentuais no caso do aluno ler livros frequentemente. O maior efeito marginal foi verificado para o parâmetro associado à reprovação escolar, com a probabilidade do aluno que já foi reprovado alcançar uma nota igual ou superior a 250 pontos reduzindo em 97,30 pontos percentuais. Os alunos brancos possuem uma probabilidade 26,72 pontos percentuais maior de obter ao menos 250 pontos no exame do que os alunos não brancos.A Tabela 6 apresenta a estimação do modelo logit considerando uma variável de interação entre turno e trabalho fora de casa. 
+
+```{r interacao}
+logitIT <- glm(Nivel_3 ~ TX_RESP_Q002 + TX_RESP_Q006B + Turno_N + 
+              TX_RESP_Q015 + TX_RESP_Q017E + TX_RESP_Q018B +
+              (Turno_N*TX_RESP_Q017E),
+              data = dados, family = binomial)
+summary(logitIT)
+```
+
+**Tabela 6 - Resultados da Estimação do Modelo Logit com Interação Para Determinantes da Proficiência em Língua Portuguesa de alunos do 9º ano de Pernambuco no SAEB 2011**
+
+Var. Depend.   |Coef.      |Erro-padrão    |Estatística  z    |p-valor
+---------------|-----------|---------------|------------------|----------
+Intercepto     |0,10848    |0,05233        |2,073             |0,0389
+TX_RESP_Q002   |0,26725    |0,01828        |14,618            |0,0000
+TX_RESP_Q006B  |0,08407    |0,05140        |1,636             |0,1019
+Turno_N        |0,28004    |0,12707        |2,204             |0,0275
+TX_RESP_Q015   |-0,97318   |0,01732        |-56,186           |0,0000
+TX_RESP_Q017E  |-0,36609   |0,01853        |-19,757           |0,0000
+TX_RESP_Q018B  |0,34437    |0,01665        |20,684            |0,0000
+V. Interação   |0,21808    |0,19513        |1,118             |0,2637
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+Conforme demonstra a Tabela 6, o coeficiente estimado para a variável de interação entre trabalho fora de casa e turno noturno não apresentou significância estatísitica, quando observados o Z e o p-valor, não sendo possível inferir o seu efeito na variável dependente. Como os sinais observados para as duas variáveis era divergente, esperava-se que a variável de interação apresentasse sinal negativo, o que também não ocorreu. A variável de interação apresentou sinal e magnitude similares aos observados para a variável de turno isolada. De modo geral, o segundo modelo estimado apresentou as mesmas características do modelo anterior, em termos de significância, sinal e grandeza dos parâmetros. 
+Diferentemente do que ocorre nos modelos que utilizam o MQO, os modelos de regressão logística não pressupões a existência de normalidade dos resíduos.  No entanto, são apresentados abaixo os gráficos QQ-PLOT que atestam a não normalidade dos resíduos do modelos estimados, ainda que não seja algo que cause maiores preocupações.
+
+
+```{r residuosnorm}
+par(mfrow=c(2,1))
+plot(logit, 2)
+plot(logitIT, 2)
+```
+  
+Apesar dos dados foram coletados no mesmo ponto do tempo, a necessidade de verificação de autocorrelação se dá pela possibilidade de se encontrar a chamada autocorrelação espacial. Ou seja, diferentemente das séries temporais, a autocorrelação pode aparecer aqui porque os dados foram originalmente coletados em pontos do espaço distintos (escolas e municípios diferentes). É esperado que seja detectada a presença heterocedasticidade no modelo estimado, pelo mesmo ser estimado com dados em corte transversal. Optou-se por não verificar a existência de multicolinearidade pois, segundo Gujarati e Porter (2011), a presença de multicolinearidade é um problema maior apenas quando se busca realizar previsões. A Tabela 7 apresenta os resultados dos testes de autocorrelação e heterocedasticidade para o segundo modelo estimado (incluindo um variávels de interação).
+
+```{r pressupostos}
+library(lmtest)
+library(car)
+bptest(logitIT)
+dwtest(logitIT)
+bgtest(logitIT)
+```
+
+**Tabela 7 - Testes de Autocorrelação e Heterocedasticidade para o Modelo Estimado com Interação**
+ 
+**Heterocedasticidade**   |Estatística do teste   |p-valor
+--------------------------|-----------------------|---------------------
+Breusch-Pagan             |200,07                 |0,0000
+**Autocorrelação**        |                       | 
+Durbin-Watson             |1,8602                 |0,0000
+Breusch-Godfrey           |364,44                 |0,0000
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+A tabela acima demonstra que foram detectadas as presenças de autocorrelação e de heterocedasticidade no modelo estimado. Foram realizados dois testes de autocorrelação pois é comum que encontrar um DW do teste de Durbin-Watson que se situe na região inconclusiva do teste. Assim, observando os p-valores, foi possível descartar as hipóteses nulas de homocedasticidade, do teste de Breusch-Pagan, e de ausência de autocorrelação dos testes de Durbin-Watsin e Breusch-Godfrey. Como medida "corretiva", foi aplicada a matriz HC3 de White, que permite a inferência mesmo na presença de dos problemas econométricos já citados. É importante destacar que tal medida não elimina os problemas encontrados, visto que eles estão presentes na amostra, e nem altera os coeficientes estimados anteriormente e apresentados na Tabela 6. Os resultados da estimação com erro-padrão robusto para heterocedasticidade e autocorrelação são apresentados na Tabela 8.
+
+
+```{r robusta}
+library(sandwich)
+coeftest(logitIT, 
+         vcov = vcovHC(logitIT, type = "HC3"))
+```
+**Tabela 8 - Resultados da Estimação do Modelo Logit com Interação Para Determinantes da Proficiência em Língua Portuguesa de alunos do 9º ano de Pernambuco no SAEB 2011 com Erro-padrão Roubsto**
+
+Var. Depend.   |Coef.      |Erro-padrão    |Estatística  z    |p-valor
+---------------|-----------|---------------|------------------|----------
+Intercepto     |0,10847    |0,05191        |2,089             |0,0366
+TX_RESP_Q002   |0,26725    |0,01822        |14,663            |0,0000
+TX_RESP_Q006B  |0,08407    |0,05090        |1,648             |0,0991
+Turno_N        |0,28004    |0,12330        |2,271             |0,0231
+TX_RESP_Q015   |-0,97318   |0,01734        |-56,094           |0,0000
+TX_RESP_Q017E  |-0,36609   |0,01858        |-19,699           |0,0000
+TX_RESP_Q018B  |0,34437    |0,01669        |20,621            |0,0000
+V. Interação   |0,21808    |0,19202        |1,135             |0,2560
+Fonte: Elaboração própria a partir de dados do SAEB 2019.
+
+
+Conforme indicado anteriormente, a estimação com a matriz HC3 de White não altera os coeficientes estimados, com a interpretação dos mesmos permanecendo intalterada.A únicas alterações ocorridas podem ser verificadas nas colunas de erro-padrão, estatística Z e p-valor. É importante destacar que não houve nenhuma alteração capaz de modificar a significância estatística individual dos parâmetros.
+
+
+## Considerações Finais
+
+
+Os resultados obtidos indicaram que a maioria dos fatores estudados foram significantes para a determinação da proficiência em Língua Portuguesa de alunos do 9º ano de Pernambuco no SAEB 2019, com exceção do incentivo dos pais ao aluno estudar. Os resultados apontaram que alunos que tiveram ao menos uma reprovação apresentam uma probabilidade de 97 pontos percentuais de não alcançarem uma nota superior a 250 na prova de língua portuguesa do SAEB. Também é possível observar que aqueles estudantes que não trabalham fora de casa obtêm resultados melhores no SAEB que àqueles que trabalham. Isso decorre da possibilidade do aluno ter mais tempo livre para se dedicar aos estudos não só de Língua Portuguesa, como das demais disciplinas. Por fim, os alunos que costumam ler livros com frequência também obtêm um resultado melhor em Língua Portuguesa no SAEB. A relação é esperada, já que o aumento da leitura leva a uma maior habilidade de compreensão e interpretação de textos, estes, alguns dos itens avaliados no exame. 
+De modo geral, o sinal contraintuitivo obtido para a variável de turno foi uma supresa, assim como a não significância da variável de interação inserida no segundo modelo estimado. A hipótese de que os alunos que frequentam a escola no período noturno sejam aqueles que trabalham fora de casa não se confirmou, ao menos não com o desenho de pesquisa utilizado. É possível que esse resultado tenha sido encontrado devido uma questão amostral. Analogamente, pode-se verificar, em trabalhos futuros, 
+se existe uma diferença na proficiência em língua portuguesa entre alunos matriculados em turno único e em tempo integral.
+A principal contribuição prática deste trabalho foi identificar empiricamente uma ideia bastante difundida na sociedade: uma reprovação escolar é bastante prejudicial ao aprendizado e desempenho do aluno. Isso, contudo, não poder servir de embasamento para a adoção de políticas educacionais do tipo "aprovação automática". É necessário buscar identificar os fatores que mais contribuem para a reprovação de um aluno e, a partir disso, criar mecanismos e políticas de auxílio ao estudante de modo a melhorar o seu desempenho na escola e evitar a reprovação. Possíveis estudos na área podem ser feitos buscando estimar os fatores que afetam probabilidades de reprovação de um aluno. Outra possibilidade seria uma modificação no modelo estimado para buscar identificar quais são os fatores e características das escolas que conseguem atingir a meta estabelecida para o IDEB a cada dois anos. Nesse caso, pode-se usar tanto as informações de apenas uma edição do SAEB ou de mais edições, o que certamente melhoraria os resultados por incorporar as mudanças estruturais ocorridas no intervalo de dois anos entre a realização do exame.
+Em termos gerais, o modelo foi capaz de responder as perguntas provocadas apesar das limitações já explanadas anteriormente. Embora a relação encontrada não seja de causalidade pura, é possível sugerir que ao menos a reprovação escolar pode causar a não obtenção do nível 3 ou superior de proficiência em língua portuguesa no sentido de Granger (visto que um evento A causa B no sentido de Granger se B é antecedido por A). A incorporação de novas variáveis ao modelo pode melhorar os resultados encontrados, mas não há nenhum indício de que seriam capaz de afetar a significância das variáveis já incorporadas (a não ser que seja provocado um problema de multicolinearidade). Da mesma forma, não há nenhum indicío teórico ou empírico que permita supor que a proficiência em língua portuguesa, enquanto variável operacionalizada, seja capaz de causar qualquer uma das variáveis dependentes utilizadas.
+
+
+
+## Referências
+
+BASSETTO, Camila Fernanda. Background familiar e desempenho escolar: uma abordagem com variáveis binárias a partir dos resultados do Saresp. **Revista Brasileira de Estudos de População**, v. 36, 2019.
+
+BRASIL, Instituto Nacional de Estudos e Pesquisas Anísio Teixeira. **Sistema de Avaliação da Educação Básica 20119**. Disponível em: https://www.gov.br/inep/pt-br/.
+
+FIGUEIRA, Cleonis Viater. **Modelos de regressão logística**. 2006.
+
+GUJARATI, Damodar N.; PORTER, Dawn C. **Econometria Básica**. Tradução de D. Durante; M. Rosemerg; M. L. G. L. Rosa. 5ª ed. Porto Alegre: AMGH, 2011.
+
+IBGE - Instituto Brasileiro de Geografia e estatística. **Pesquisa Nacional por Amostra de Domicílios Contínua - PNADC**, 2020. 
+
+KELLSTEDT, Paul M.; WHITTEN, Guy D. **The fundamentals of political science research**. Cambridge University Press, 2018.
+
+MAIA, Sinézio F. **Introdução a Estatística Descritiva: Conceitos e Aplicações.** João Pessoa, 2016. Disponível em: http://salaacoes.blogspot.com/2018/04/curso-de-econometria.html
+
+MELLO, Guiomar Namo. **Políticas públicas de educação**. Estudos Avançados, vol 5. São Paulo. 1991.
+
+SHIRASU, Maitê R.; ARRAES, Ronaldo A. **Determinantes da Evasão e Repetência Escolar**. In: 46º Encontro Nacional de Economia – Anpec, 2015. Disponível em: https://www.anpec.org/encontro/2015/submissão/files_I/i1285f3c3774c3d65741cb278e01e61db39.pdf
+

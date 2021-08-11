@@ -1,4 +1,7 @@
-# Trabalho Final - Analise de Dados
+# Universidade Federal de Pernambuco
+# Centro de Filosofia e Ciencias Humanas
+# Departamento de Ciencia Politica
+#Trabalho Final - Analise de Dados
 setwd("D:/luizf/Documents/PPGCP/2021.1/AnDados/Trab final/")
 options(scipen = 9999)
 options(max.print =100000)
@@ -80,10 +83,10 @@ ggplot(dados, aes(x = PROFICIENCIA_LP_SAEB)) +
        x ="Nota LP", y = "Densidade")+
   theme_classic()
 #Testes
+library(fBasics)
 skewness(dados$PROFICIENCIA_LP_SAEB)
 kurtosis(dados$PROFICIENCIA_LP_SAEB)
 jarqueberaTest(dados$PROFICIENCIA_LP_SAEB)
-shapiro.test(dados$PROFICIENCIA_LP_SAEB)
 # QQ-PLOT 
 qqnorm(dados$PROFICIENCIA_LP_SAEB, col="blue3")
 qqline(dados$PROFICIENCIA_LP_SAEB, col = "red")
@@ -95,7 +98,7 @@ t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q006B, data = dados)
 t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q015, data = dados)
 t.test(PROFICIENCIA_LP_SAEB ~ TX_RESP_Q017E, data = dados)
 #Qui-quadrado
-chisq.test(dados$Nivel_6, dados$TX_RESP_Q017E)
+chisq.test(dados$Nivel_3, dados$TX_RESP_Q017E)
 chisq.test(dados$TX_RESP_Q017E, dados$Turno_N)
 
 
@@ -114,3 +117,21 @@ logitIT <- glm(Nivel_3 ~ TX_RESP_Q002 + TX_RESP_Q006B + Turno_N +
               data = dados, family = binomial)
 
 summary(logitIT)
+
+# Resíduos
+par(mfrow=c(2,1))
+plot(logit, 2)
+plot(logitIT, 2)
+
+# Autocorrelacao e Heterocedasticidade
+library(lmtest)
+library(car)
+bptest(logitIT)
+dwtest(logitIT)
+bgtest(logitIT)
+
+# Estimacao Robusta
+library(sandwich)
+coeftest(logitIT, 
+         vcov = vcovHC(logitIT, type = "HC3"))
+         
